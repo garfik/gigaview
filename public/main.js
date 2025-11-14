@@ -227,10 +227,22 @@ function updateDownloaded() {
   document.getElementById("downloaded").textContent = mb;
 }
 
+// Handle logo click to show about page
+const logoEl = document.getElementById("logo");
+logoEl.addEventListener("click", () => {
+  document.getElementById("about").classList.remove("hidden");
+  document.getElementById("map").classList.add("hidden");
+  downloadedBytes = 0;
+  document.getElementById("file-size").textContent = "-";
+  updateDownloaded();
+});
+
 const listEl = document.getElementById("image-list");
 listEl.addEventListener("click", (e) => {
   const clickedElement = e.target.closest("[data-id]");
   if (clickedElement) {
+    document.getElementById("about").classList.add("hidden");
+    document.getElementById("map").classList.remove("hidden");
     loadImage(clickedElement.dataset.id);
   }
 });

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
     <style>
         #map { height: calc(100vh - 80px); background-color: #ddd; }
     </style>
@@ -17,7 +18,7 @@
     <div class="flex h-screen">
         <div class="w-64 bg-white shadow-lg overflow-y-auto">
             <div class="p-4 border-b">
-                <h1 class="text-xl font-bold">Gigaview</h1>
+                <h1 id="logo" class="text-xl font-bold cursor-pointer hover:text-blue-600 transition-colors">Gigaview</h1>
             </div>
             <div id="image-list" class="p-2">
                 <div class="text-gray-500 text-sm p-2">Loading images...</div>
@@ -30,7 +31,47 @@
                     <div>Downloaded: <span id="downloaded">0</span> MB</div>
                 </div>
             </div>
-            <div id="map"></div>
+            <div class="flex-1 flex">
+                <div id="about" class="w-1/2 p-8 bg-gradient-to-br from-blue-50 to-indigo-50 overflow-y-auto">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-3xl font-bold text-gray-800">Gigaview</h2>
+                            <div class="flex gap-2 items-center">
+                                <a class="github-button" href="https://github.com/garfik/gigaview" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star garfik/gigaview on GitHub">Star</a>
+                                <a class="github-button" href="https://github.com/garfik/gigaview/fork" data-icon="octicon-repo-forked" data-size="large" data-show-count="true" aria-label="Fork garfik/gigaview on GitHub">Fork</a>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4 px-3 py-2 bg-blue-100 rounded-lg border border-blue-200">
+                            <strong>Demo Project:</strong> This is a proof-of-concept demonstrating how to quickly build an interesting prototype using <strong>Leaflet</strong> and <strong>libvips</strong> for on-demand tile rendering of gigapixel images.
+                        </p>
+                        <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+                            An interactive tile-based viewer for large images. 
+                            Gigaview allows you to load and view images of any size 
+                            using an efficient tiling system that only loads visible 
+                            portions of the image.
+                        </p>
+                        <div class="space-y-4 text-gray-600">
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Key Features:</h3>
+                                <ul class="list-disc list-inside space-y-2 ml-2">
+                                    <li>View images of any size without downloading the entire file</li>
+                                    <li>Zoom and pan with smooth navigation</li>
+                                    <li>Efficient bandwidth usage</li>
+                                    <li>Download statistics tracking</li>
+                                </ul>
+                            </div>
+                            <div class="mt-6 pt-6 border-t border-gray-300">
+                                <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                                    <p class="text-base font-semibold text-indigo-900">
+                                        Select an image from the list on the left to start viewing.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="map" class="flex-1 hidden"></div>
+            </div>
         </div>
     </div>
     <script>

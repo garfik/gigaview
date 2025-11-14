@@ -13,5 +13,9 @@ func (c *NoopCache) Get(key TileKey) ([]byte, bool) {
 func (c *NoopCache) Set(key TileKey, value []byte) {
 }
 
+func (c *NoopCache) Has(key TileKey) bool {
+	return false
+}
+
 func (c *NoopCache) Clear() {
 }

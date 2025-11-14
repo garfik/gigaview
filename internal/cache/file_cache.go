@@ -33,6 +33,15 @@ func (c *FileCache) buildFilePath(key TileKey) string {
 	return filepath.Join(dir, fileName)
 }
 
+func (c *FileCache) Has(key TileKey) bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	filePath := c.buildFilePath(key)
+	_, err := os.Stat(filePath)
+	return err == nil
+}
+
 func (c *FileCache) Get(key TileKey) ([]byte, bool) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()

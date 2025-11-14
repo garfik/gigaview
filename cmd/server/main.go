@@ -89,7 +89,7 @@ func main() {
 	handler := handlers.CORSMiddleware(handlers.RequestLoggingMiddleware(mux))
 
 	if cfg.WarmupLevels > 0 {
-		go warmupTiles(cfg.WarmupLevels, cfg.WarmupWorkers, scanner, renderer, log)
+		go warmupTiles(cfg.WarmupLevels, cfg.WarmupWorkers, scanner, tileCache, renderer, log)
 	}
 
 	server := &http.Server{
@@ -121,7 +121,7 @@ func main() {
 	log.Info("Server stopped")
 }
 
-func warmupTiles(levels int, workerLimit int, scanner *image_list.Scanner, renderer *image_renderer.Renderer, log *zap.Logger) {
+func warmupTiles(levels int, workerLimit int, scanner *image_list.Scanner, tileCache cache.Cache, renderer *image_renderer.Renderer, log *zap.Logger) {
 	images := scanner.GetImages()
 	if len(images) == 0 {
 		return
@@ -137,6 +137,9 @@ func warmupTiles(levels int, workerLimit int, scanner *image_list.Scanner, rende
 	workerChan := make(chan struct{}, workerLimit)
 	var wg sync.WaitGroup
 
+	totalTiles := 0
+	skippedTiles := 0
+
 	for _, img := range images {
 		maxZoom := renderer.CalculateMaxZoom(img.Width, img.Height)
 		warmupZoom := levels
@@ -150,6 +153,24 @@ func warmupTiles(levels int, workerLimit int, scanner *image_list.Scanner, rende
 
 			for x := 0; x < tilesX; x++ {
 				for y := 0; y < tilesY; y++ {
+					totalTiles++
+
+					// Check if tile is already cached before rendering
+					cacheKey := cache.TileKey{
+						ImageID:  img.ID,
+						TileSize: 256,
+						MaxZoom:  maxZoom,
+						Z:        z,
+						X:        x,
+						Y:        y,
+						Format:   "jpeg",
+					}
+
+					if tileCache.Has(cacheKey) {
+						skippedTiles++
+						continue // Skip already cached tiles
+					}
+
 					wg.Add(1)
 					workerChan <- struct{}{} // Acquire worker slot
 
@@ -168,5 +189,5 @@ func warmupTiles(levels int, workerLimit int, scanner *image_list.Scanner, rende
 	}
 
 	wg.Wait()
-	log.Info("Tile warmup completed")
+	log.Info("Tile warmup completed", zap.Int("total_tiles", totalTiles), zap.Int("skipped_cached", skippedTiles), zap.Int("rendered", totalTiles-skippedTiles))
 }

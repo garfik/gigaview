@@ -27,6 +27,14 @@ func NewMemoryCache(maxSize int) *MemoryCache {
 	}
 }
 
+func (c *MemoryCache) Has(key TileKey) bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	_, ok := c.items[key]
+	return ok
+}
+
 func (c *MemoryCache) Get(key TileKey) ([]byte, bool) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()

@@ -19,6 +19,7 @@ services:
       # - UPLOAD_TOKEN=your-secret-token-here
       # - MAX_UPLOAD_SIZE=4294967296
       - ALLOWED_ORIGIN=*
+      - PUBLIC_BASE_URL=http://localhost:8080
     mem_limit: 1536m
     mem_reservation: 768m
 

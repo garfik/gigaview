@@ -1,0 +1,25 @@
+services:
+  gigaview:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+    environment:
+      - DATA_DIR=/data
+      - WARMUP_LEVELS=10
+      - CACHE=file
+      - CACHE_FILE_DIR=/data/cache
+      - CACHE_MEMORY_TILES=256
+      - VIPS_CONCURRENCY=4
+      # - GOMAXPROCS=2  # Uncomment and adjust based on your CPU cores
+      - LOG_LEVEL=info
+      # - GOMEMLIMIT=400MiB  # Uncomment and adjust based on available memory
+      # - GOGC=50  # Uncomment to adjust GC aggressiveness (default 100)
+      # - UPLOAD_TOKEN=your-secret-token-here
+      # - MAX_UPLOAD_SIZE=4294967296
+      - ALLOWED_ORIGIN=*
+    mem_limit: 1536m
+    mem_reservation: 768m
+
+

@@ -174,12 +174,14 @@ func (r *Renderer) GetImageMeta(imageID string) (map[string]interface{}, error) 
 	maxZoom := r.CalculateMaxZoom(imageInfo.Width, imageInfo.Height)
 
 	return map[string]interface{}{
-		"width":    imageInfo.Width,
-		"height":   imageInfo.Height,
-		"tileSize": 256,
-		"maxZoom":  maxZoom,
-		"bytes":    imageInfo.Bytes,
-		"format":   "jpeg",
+		"width":          imageInfo.Width,
+		"height":         imageInfo.Height,
+		"tileSize":       256,
+		"maxZoom":        maxZoom,
+		"bytes":          imageInfo.Bytes,
+		"format":         "jpeg",
+		"copyright_text": imageInfo.CopyrightText,
+		"copyright_link": imageInfo.CopyrightLink,
 	}, nil
 }
 

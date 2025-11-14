@@ -19,6 +19,8 @@ type ImageInfo struct {
 	Width            int    `json:"width"`
 	Height           int    `json:"height"`
 	Bytes            int64  `json:"bytes"`
+	CopyrightText    string `json:"copyright_text"`
+	CopyrightLink    string `json:"copyright_link"`
 }
 
 type Scanner struct {
@@ -281,7 +283,7 @@ func (s *Scanner) saveMetadata(path string, meta *ImageInfo) error {
 }
 
 // ProcessUploadedFile processes an uploaded file: generates UUID, saves as UUID.ext, creates metadata
-func (s *Scanner) ProcessUploadedFile(tempPath string, originalFilename string) (string, error) {
+func (s *Scanner) ProcessUploadedFile(tempPath string, originalFilename string, copyrightText string, copyrightLink string) (string, error) {
 	// Get file extension
 	ext := strings.ToLower(filepath.Ext(originalFilename))
 
@@ -311,6 +313,8 @@ func (s *Scanner) ProcessUploadedFile(tempPath string, originalFilename string) 
 	imageInfo.ID = newUUID
 	imageInfo.OriginalFilename = originalFilename
 	imageInfo.CurrentFilename = filepath.Base(finalPath)
+	imageInfo.CopyrightText = copyrightText
+	imageInfo.CopyrightLink = copyrightLink
 
 	// Save metadata
 	jsonPath := s.getFilePath(newUUID + ".json")

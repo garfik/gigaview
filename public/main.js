@@ -9,8 +9,8 @@ let currentImageMeta = null;
 function getBaseUrl() {
   // If BASE_URL wasn't replaced by the backend (still has placeholder),
   // use default localhost:8080 for local development
-  if (!window.BASE_URL || window.BASE_URL === '__PUBLIC_BASE_URL__') {
-    return 'http://localhost:8080';
+  if (!window.BASE_URL || window.BASE_URL === "__PUBLIC_BASE_URL__") {
+    return "http://localhost:8080";
   }
   return window.BASE_URL;
 }
@@ -70,11 +70,10 @@ async function loadImage(imageId) {
 
     // Initialize Leaflet map with CRS.Simple coordinate system
     map = L.map("map", {
-
       // CRS.Simple treats the map as a flat plane with pixel coordinates
       // This is perfect for displaying large images as tile layers
       // because we don't geographic projection
-      crs: L.CRS.Simple, 
+      crs: L.CRS.Simple,
       minZoom: 0, // Minimum zoom level (full image view)
       maxZoom: currentImageMeta.maxZoom, // Maximum zoom level (highest detail)
       zoomSnap: 1, // Snap to integer zoom levels only
@@ -141,6 +140,43 @@ async function loadImage(imageId) {
     // This can be used for annotations or user-drawn overlays on the image
     drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
+
+    // ----- Add copyright control in bottom-right corner using Leaflet Control
+    if (currentImageMeta.copyright_text || currentImageMeta.copyright_link) {
+      const copyrightControl = L.control({ position: "bottomright" });
+
+      copyrightControl.onAdd = function () {
+        const div = L.DomUtil.create("div", "leaflet-control-copyright");
+        div.classList.add(
+          "bg-black",
+          "bg-opacity-70",
+          "px-3",
+          "py-2",
+          "rounded",
+          "text-xs",
+          "max-w-xs",
+          "leading-relaxed",
+          "[&_a]:text-blue-300",
+          "[&_a]:underline",
+          "[&_a:hover]:text-blue-200"
+        );
+
+        if (currentImageMeta.copyright_link) {
+          const link = L.DomUtil.create("a", "", div);
+          link.href = currentImageMeta.copyright_link;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent =
+            currentImageMeta.copyright_text || currentImageMeta.copyright_link;
+        } else if (currentImageMeta.copyright_text) {
+          div.textContent = currentImageMeta.copyright_text;
+        }
+
+        return div;
+      };
+
+      copyrightControl.addTo(map);
+    }
 
     // ----- Track tile loading for download statistics
     // The 'tileload' event fires when a tile successfully loads

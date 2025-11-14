@@ -174,7 +174,10 @@ func (h *Handlers) HandleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	tempFile.Close()
 
-	imageID, err := h.scanner.ProcessUploadedFile(tempPath, header.Filename)
+	copyrightText := r.FormValue("copyright_text")
+	copyrightLink := r.FormValue("copyright_link")
+
+	imageID, err := h.scanner.ProcessUploadedFile(tempPath, header.Filename, copyrightText, copyrightLink)
 	if err != nil {
 		if _, statErr := os.Stat(tempPath); statErr == nil {
 			os.Remove(tempPath)

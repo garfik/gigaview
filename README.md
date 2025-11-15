@@ -5,7 +5,7 @@ A demo project showing how to render gigapixel images in the browser using on-de
 ## Technologies
 
 - **[libvips](https://www.libvips.org/)** + **[github.com/cshum/vipsgen](https://github.com/cshum/vipsgen)**: Essential for processing multi-gigabyte images without loading entire files into memory. Uses memory-mapped files and processes images in chunks, making it possible to work with gigapixel images even on servers with limited RAM.
-- **[Leaflet](https://leafletjs.com/)**: Excellent tool for working with maps and tile layers. Provides smooth pan/zoom functionality and handles tile loading efficiently. As a bonus point even possible to add annotation to picture if needed with the same API as for maps. 
+- **[Leaflet](https://leafletjs.com/)**: Excellent tool for working with maps and tile layers. Provides smooth pan/zoom functionality and handles tile loading efficiently. As a bonus point even possible to add annotation to picture if needed with the same API as for maps.
 - **Go**: Backend language of choice (I'm not a professional Go developer, but I really enjoy the language and wanted to use it for this project).
 
 ## Quick Start
@@ -13,15 +13,18 @@ A demo project showing how to render gigapixel images in the browser using on-de
 ### Using Docker Compose (Recommended)
 
 1. Place your images in the `data/` directory:
+
    ```bash
    # Copy your images to data/
    ```
 
    I would suggest to use some images from:
-   * https://esahubble.org/images/hubble_large_05_cc/
-   * https://esahubble.org/images/heic1502a/
+
+   - https://esahubble.org/images/hubble_large_05_cc/
+   - https://esahubble.org/images/heic1502a/
 
 2. Start the server:
+
    ```bash
    docker-compose up --build
    ```
@@ -36,6 +39,7 @@ A demo project showing how to render gigapixel images in the browser using on-de
 ### Using Docker
 
 1. Build the image:
+
    ```bash
    docker build -t gigaview .
    ```
@@ -57,25 +61,25 @@ A demo project showing how to render gigapixel images in the browser using on-de
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `8080` | HTTP server port |
-| `DATA_DIR` | `/data` | Directory containing images |
-| `CACHE` | `memory` | Cache type: `memory`, `file`, or `disabled` |
-| `CACHE_MEMORY_TILES` | `2000` | Maximum number of tiles in memory cache (only for `memory` cache) |
-| `CACHE_FILE_DIR` | `{DATA_DIR}/cache` | Directory for file cache (only for `file` cache) |
-| `WARMUP_LEVELS` | `1` | Number of zoom levels to pre-render (0 to disable) |
-| `WARMUP_WORKERS` | `1` | Number of concurrent workers for warmup |
-| `VIPS_MAX_CACHE_MB` | `256` | Maximum memory for libvips cache (MB) |
-| `VIPS_CONCURRENCY` | `1` | Number of concurrent libvips operations |
-| `LOG_LEVEL` | `info` | Logging level (`debug`, `info`, `warn`, `error`) |
-| `UPLOAD_TOKEN` | (empty) | Token for upload authentication (empty = public upload) |
-| `MAX_UPLOAD_SIZE` | `4294967296` | Maximum upload size in bytes (default 4GB) |
-| `ALLOWED_ORIGIN` | (empty) | Allowed CORS origin (empty = same-origin only) |
-| `PUBLIC_BASE_URL` | `http://localhost:8080` | Public base URL for the application |
-| `GOMAXPROCS` | (auto) | Number of OS threads Go scheduler may run (defaults to number of CPU cores) |
-| `GOMEMLIMIT` | (unlimited) | Soft limit for Go heap usage (e.g., `400MiB`, `1GiB`) |
-| `GOGC` | `100` | GC aggressiveness: lower = more frequent GC, higher = less frequent (default 100) |
+| Variable             | Default                 | Description                                                                       |
+| -------------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| `PORT`               | `8080`                  | HTTP server port                                                                  |
+| `DATA_DIR`           | `/data`                 | Directory containing images                                                       |
+| `CACHE`              | `memory`                | Cache type: `memory`, `file`, or `disabled`                                       |
+| `CACHE_MEMORY_TILES` | `2000`                  | Maximum number of tiles in memory cache (only for `memory` cache)                 |
+| `CACHE_FILE_DIR`     | `{DATA_DIR}/cache`      | Directory for file cache (only for `file` cache)                                  |
+| `WARMUP_LEVELS`      | `1`                     | Number of zoom levels to pre-render (0 to disable)                                |
+| `WARMUP_WORKERS`     | `1`                     | Number of concurrent workers for warmup                                           |
+| `VIPS_MAX_CACHE_MB`  | `256`                   | Maximum memory for libvips cache (MB)                                             |
+| `VIPS_CONCURRENCY`   | `1`                     | Number of concurrent libvips operations                                           |
+| `LOG_LEVEL`          | `info`                  | Logging level (`debug`, `info`, `warn`, `error`)                                  |
+| `UPLOAD_TOKEN`       | (empty)                 | Token for upload authentication (empty = public upload)                           |
+| `MAX_UPLOAD_SIZE`    | `4294967296`            | Maximum upload size in bytes (default 4GB)                                        |
+| `ALLOWED_ORIGIN`     | (empty)                 | Allowed CORS origin (empty = same-origin only)                                    |
+| `PUBLIC_BASE_URL`    | `http://localhost:8080` | Public base URL for the application                                               |
+| `GOMAXPROCS`         | (auto)                  | Number of OS threads Go scheduler may run (defaults to number of CPU cores)       |
+| `GOMEMLIMIT`         | (unlimited)             | Soft limit for Go heap usage (e.g., `400MiB`, `1GiB`)                             |
+| `GOGC`               | `100`                   | GC aggressiveness: lower = more frequent GC, higher = less frequent (default 100) |
 
 ### Performance Tuning
 
@@ -84,13 +88,14 @@ These settings allow you to balance between performance and resource usage:
 - **`GOMAXPROCS`**: By default, Go uses all available CPU cores. If you need to limit CPU usage to keep your server responsive, set this to a lower value (e.g., `2` or `4`). Leave it unset to use all cores for maximum performance.
 - **`VIPS_CONCURRENCY`**: Controls parallel image processing in libvips. Higher values (e.g., `4` or `8`) speed up tile rendering but use more CPU and memory. Lower values (e.g., `1` or `2`) save resources but are slower.
 - **`VIPS_MAX_CACHE_MB`**: libvips internal cache size. If you have plenty of RAM, increase this (e.g., `512` or `1024`) for better performance. If memory is critical, decrease it (e.g., `128` or `256`), but this will reduce speed.
-- **`CACHE`**: 
+- **`CACHE`**:
   - `memory` cache is fast but uses RAM and is lost on restart
   - `file` cache persists across restarts and helps with warmup, but uses disk space. Use it if you want to pre-warm images and don't mind using disk space.
 - **`CACHE_MEMORY_TILES`**: Only applies to `memory` cache. Higher values cache more tiles in RAM (faster) but use more memory. Lower values save memory but may cause more re-rendering.
 - **`GOMEMLIMIT`** and **`GOGC`**: Use these to control Go's memory usage. Set `GOMEMLIMIT` to cap heap usage if memory is constrained. Adjust `GOGC` - lower values (e.g., `50`) trigger GC more frequently and use less memory, higher values (e.g., `200`) use more memory but GC less often.
 
 **Example: Minimal resource usage** (server stays responsive, low RAM usage):
+
 ```bash
 GOMAXPROCS=2
 VIPS_CONCURRENCY=1
@@ -102,6 +107,7 @@ WARMUP_LEVELS=1
 ```
 
 **Example: Maximum performance** (32GB RAM, 16 CPU cores, GOMAXPROCS not set):
+
 ```bash
 VIPS_CONCURRENCY=8
 VIPS_MAX_CACHE_MB=4096
@@ -164,6 +170,10 @@ go build ./cmd/server
 - **Storage**: No database - images from filesystem
 
 Main action is happening in two files: main.js (frontend) and renderer.go (backend)
+
+## Author
+
+Created by [Dmitrii Kulikov](https://kulikov.fi)
 
 ## Note
 

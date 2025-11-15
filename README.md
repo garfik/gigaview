@@ -124,6 +124,12 @@ Two cache implementations are available:
 
 **Output tile format:** JPEG (256×256 tiles)
 
+### Format Recommendations
+
+For **very large images** (gigapixel images), **TIFF format is strongly recommended**. TIFF files are designed for large images and work efficiently with memory-mapped file access, allowing libvips to process them without loading the entire file into memory.
+
+**PNG files can require significantly more memory** when processing large images, as they may need to be fully decompressed into memory. For gigapixel images, PNG can consume excessive amounts of RAM and may cause performance issues or memory errors.
+
 ## Features
 
 - On-demand tile rendering (256×256 tiles)

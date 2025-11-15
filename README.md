@@ -2,6 +2,10 @@
 
 A demo project showing how to render gigapixel images in the browser using on-demand tile rendering. This is a proof-of-concept implementation, not production-ready code.
 
+**Live Demo:** [https://gigaview.public.kulikov.fi/](https://gigaview.public.kulikov.fi/)
+
+![Screenshot](public/screenshot.png)
+
 ## Technologies
 
 - **[libvips](https://www.libvips.org/)** + **[github.com/cshum/vipsgen](https://github.com/cshum/vipsgen)**: Essential for processing multi-gigabyte images without loading entire files into memory. Uses memory-mapped files and processes images in chunks, making it possible to work with gigapixel images even on servers with limited RAM.

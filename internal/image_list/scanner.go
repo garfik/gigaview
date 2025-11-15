@@ -2,10 +2,13 @@ package image_list
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/cshum/vipsgen/vips"
 	"github.com/google/uuid"
@@ -282,29 +285,67 @@ func (s *Scanner) saveMetadata(path string, meta *ImageInfo) error {
 	return nil
 }
 
+// moveFile moves a file from source to destination, handling cross-device moves
+func moveFile(src, dst string) error {
+	err := os.Rename(src, dst)
+	if err == nil {
+		return nil
+	}
+
+	// Check if it's a cross-device link error
+	var linkErr *os.LinkError
+	if errors.As(err, &linkErr) && errors.Is(linkErr.Err, syscall.EXDEV) {
+		// Cross-device link error - need to copy instead
+		return copyFile(src, dst)
+	}
+
+	return err
+}
+
+// copyFile copies a file from source to destination
+func copyFile(src, dst string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	destFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, sourceFile)
+	if err != nil {
+		os.Remove(dst) // Clean up on error
+		return err
+	}
+
+	// Copy file permissions
+	sourceInfo, err := os.Stat(src)
+	if err == nil {
+		os.Chmod(dst, sourceInfo.Mode())
+	}
+
+	return os.Remove(src)
+}
+
 // ProcessUploadedFile processes an uploaded file: generates UUID, saves as UUID.ext, creates metadata
 func (s *Scanner) ProcessUploadedFile(tempPath string, originalFilename string, copyrightText string, copyrightLink string) (string, error) {
-	// Get file extension
 	ext := strings.ToLower(filepath.Ext(originalFilename))
-
-	// Generate UUID
 	newUUID := uuid.New().String()
-
-	// Determine final path
 	finalPath := s.getFilePath(newUUID + ext)
 
-	// Move/rename the temp file to final location
-	if err := os.Rename(tempPath, finalPath); err != nil {
+	if err := moveFile(tempPath, finalPath); err != nil {
 		return "", fmt.Errorf("failed to move uploaded file: %w", err)
 	}
 
-	// Get file info
 	info, err := os.Stat(finalPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to stat file: %w", err)
 	}
 
-	// Scan image to get dimensions
 	imageInfo, err := s.scanImage(finalPath, info)
 	if err != nil {
 		return "", fmt.Errorf("failed to scan image: %w", err)
@@ -316,7 +357,6 @@ func (s *Scanner) ProcessUploadedFile(tempPath string, originalFilename string, 
 	imageInfo.CopyrightText = copyrightText
 	imageInfo.CopyrightLink = copyrightLink
 
-	// Save metadata
 	jsonPath := s.getFilePath(newUUID + ".json")
 	if err := s.saveMetadata(jsonPath, imageInfo); err != nil {
 		return "", fmt.Errorf("failed to save metadata: %w", err)

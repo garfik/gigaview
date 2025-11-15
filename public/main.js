@@ -19,7 +19,7 @@ async function loadImageList() {
   const listEl = document.getElementById("image-list");
 
   listEl.innerHTML =
-    '<div class="text-gray-500 text-sm p-2">Loading images...</div>';
+    '<div class="text-gray-500 text-sm p-2 flex-shrink-0">Loading images...</div>';
 
   try {
     const response = await fetch(`${getBaseUrl()}/api/images`);
@@ -27,15 +27,15 @@ async function loadImageList() {
 
     if (!images.length) {
       listEl.innerHTML =
-        '<div class="text-gray-500 text-sm p-2">No images found</div>';
+        '<div class="text-gray-500 text-sm p-2 flex-shrink-0">No images found</div>';
       return;
     }
 
     listEl.innerHTML = images
       .map(
         (img) => `
-            <div class="p-2 border-b cursor-pointer hover:bg-gray-100" data-id="${img.id}">
-                <div class="font-semibold text-sm">${img.original_filename}</div>
+            <div class="p-2 border-r md:border-r-0 md:border-b cursor-pointer hover:bg-gray-100 flex-shrink-0 min-w-[150px] md:min-w-0" data-id="${img.id}">
+                <div class="font-semibold text-xs md:text-sm truncate">${img.original_filename}</div>
                 <div class="text-xs text-gray-500">${img.width} × ${img.height}</div>
             </div>
         `
@@ -44,7 +44,7 @@ async function loadImageList() {
   } catch (error) {
     console.error("Failed to load images:", error);
     listEl.innerHTML =
-      '<div class="text-red-500 text-sm p-2">Failed to load images</div>';
+      '<div class="text-red-500 text-sm p-2 flex-shrink-0">Failed to load images</div>';
   }
 }
 
@@ -244,6 +244,15 @@ listEl.addEventListener("click", (e) => {
     document.getElementById("about").classList.add("hidden");
     document.getElementById("map").classList.remove("hidden");
     loadImage(clickedElement.dataset.id);
+  }
+});
+
+// Handle window resize to update map size on mobile
+window.addEventListener("resize", () => {
+  if (map) {
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
   }
 });
 

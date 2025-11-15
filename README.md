@@ -179,6 +179,19 @@ Created by [Dmitrii Kulikov](https://kulikov.fi)
 
 I'm not a professional Go developer, but I really enjoy the language and wanted to use it for this project. This code is provided as-is for demonstration purposes.
 
+**Important:** The goal of this project was to demonstrate the product and the idea, not to write perfect code. Therefore, the code is not ideal in some places.
+
+### Possible Improvements
+
+- **Lossless quality at maximum zoom**: At maximum zoom level, it might be better to serve images without quality loss instead of compressed JPEG tiles.
+- **Warmup algorithm optimization**: The current warmup algorithm is not optimized and could be improved for better performance.
+
+### Similar Projects
+
+This project is not unique, as there are similar solutions available. For example:
+
+- **[OpenSeadragon](https://openseadragon.github.io/)** - An open-source, web-based viewer for high-resolution zoomable images, implemented in pure JavaScript.
+
 ## License
 
 This project is provided as-is, without any warranties or guarantees. I assume no responsibility for any issues, damages or consequences arising from the use of this code.

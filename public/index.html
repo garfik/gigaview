@@ -35,6 +35,11 @@
         Gigaview
       </h1>
       <div id="hud" class="flex gap-4 text-sm">
+        <div id="coordinates-info" class="hidden flex flex-col md:flex-row md:gap-2">
+          <span>X: <span id="coord-x">0</span> px, Y: <span id="coord-y">0</span> px</span>
+          <span class="hidden md:inline">|</span>
+          <span>Lat: <span id="coord-lat">0</span>, Lng: <span id="coord-lng">0</span></span>
+        </div>
         <div>File size: <span id="file-size">-</span> MB</div>
         <div>Downloaded: <span id="downloaded">0</span> MB</div>
       </div>

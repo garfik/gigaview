@@ -5,6 +5,14 @@ let drawnItems = null;
 let uniqueTiles = new Set();
 let downloadedBytes = 0;
 let currentImageMeta = null;
+let coordinateMarker = null;
+
+function hideCoordinatesDisplay() {
+  const coordInfo = document.getElementById('coordinates-info');
+  if (coordInfo) {
+    coordInfo.classList.add('hidden');
+  }
+}
 
 function getBaseUrl() {
   // If BASE_URL wasn't replaced by the backend (still has placeholder),
@@ -52,6 +60,8 @@ async function loadImage(imageId) {
   currentImageId = imageId;
   uniqueTiles.clear();
   downloadedBytes = 0;
+  coordinateMarker = null;
+  hideCoordinatesDisplay();
   updateDownloaded();
 
   try {
@@ -140,6 +150,44 @@ async function loadImage(imageId) {
     // This can be used for annotations or user-drawn overlays on the image
     drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
+
+    // ----- Single marker for coordinate display
+    // Helper function to update coordinates in HUD
+    function updateCoordinatesDisplay(latlng) {
+      const imagePoint = latLngToImagePoint(latlng.lat, latlng.lng);
+      const coordInfo = document.getElementById('coordinates-info');
+      
+      document.getElementById('coord-x').textContent = Math.round(imagePoint.x);
+      document.getElementById('coord-y').textContent = Math.round(imagePoint.y);
+      document.getElementById('coord-lat').textContent = latlng.lat.toFixed(6);
+      document.getElementById('coord-lng').textContent = latlng.lng.toFixed(6);
+      
+      coordInfo.classList.remove('hidden');
+    }
+
+    // Handle map clicks to place or move the single marker
+    map.on('click', (e) => {
+      if (coordinateMarker) {
+        // Move existing marker to new location
+        coordinateMarker.setLatLng([e.latlng.lat, e.latlng.lng]);
+        updateCoordinatesDisplay(e.latlng);
+      } else {
+        // Create new marker at click location
+        coordinateMarker = L.marker([e.latlng.lat, e.latlng.lng], {
+          draggable: false
+        });
+
+        // Remove marker on click
+        coordinateMarker.on('click', () => {
+          drawnItems.removeLayer(coordinateMarker);
+          coordinateMarker = null;
+          hideCoordinatesDisplay();
+        });
+
+        coordinateMarker.addTo(drawnItems);
+        updateCoordinatesDisplay(e.latlng);
+      }
+    });
 
     // ----- Add copyright control in bottom-right corner using Leaflet Control
     if (currentImageMeta.copyright_text || currentImageMeta.copyright_link) {

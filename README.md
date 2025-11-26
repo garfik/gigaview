@@ -4,6 +4,8 @@ A demo project showing how to render gigapixel images in the browser using on-de
 
 **Live Demo:** [https://gigaview.public.kulikov.fi/](https://gigaview.public.kulikov.fi/)
 
+*Note: The live demo collects basic visit statistics to understand usage patterns.*
+
 ![Screenshot](public/screenshot.jpg)
 
 ## Technologies

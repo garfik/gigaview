@@ -8,9 +8,9 @@ let currentImageMeta = null;
 let coordinateMarker = null;
 
 function hideCoordinatesDisplay() {
-  const coordInfo = document.getElementById('coordinates-info');
+  const coordInfo = document.getElementById("coordinates-info");
   if (coordInfo) {
-    coordInfo.classList.add('hidden');
+    coordInfo.classList.add("hidden");
   }
 }
 
@@ -155,18 +155,18 @@ async function loadImage(imageId) {
     // Helper function to update coordinates in HUD
     function updateCoordinatesDisplay(latlng) {
       const imagePoint = latLngToImagePoint(latlng.lat, latlng.lng);
-      const coordInfo = document.getElementById('coordinates-info');
-      
-      document.getElementById('coord-x').textContent = Math.round(imagePoint.x);
-      document.getElementById('coord-y').textContent = Math.round(imagePoint.y);
-      document.getElementById('coord-lat').textContent = latlng.lat.toFixed(6);
-      document.getElementById('coord-lng').textContent = latlng.lng.toFixed(6);
-      
-      coordInfo.classList.remove('hidden');
+      const coordInfo = document.getElementById("coordinates-info");
+
+      document.getElementById("coord-x").textContent = Math.round(imagePoint.x);
+      document.getElementById("coord-y").textContent = Math.round(imagePoint.y);
+      document.getElementById("coord-lat").textContent = latlng.lat.toFixed(6);
+      document.getElementById("coord-lng").textContent = latlng.lng.toFixed(6);
+
+      coordInfo.classList.remove("hidden");
     }
 
     // Handle map clicks to place or move the single marker
-    map.on('click', (e) => {
+    map.on("click", (e) => {
       if (coordinateMarker) {
         // Move existing marker to new location
         coordinateMarker.setLatLng([e.latlng.lat, e.latlng.lng]);
@@ -174,11 +174,11 @@ async function loadImage(imageId) {
       } else {
         // Create new marker at click location
         coordinateMarker = L.marker([e.latlng.lat, e.latlng.lng], {
-          draggable: false
+          draggable: false,
         });
 
         // Remove marker on click
-        coordinateMarker.on('click', () => {
+        coordinateMarker.on("click", () => {
           drawnItems.removeLayer(coordinateMarker);
           coordinateMarker = null;
           hideCoordinatesDisplay();
@@ -275,6 +275,14 @@ function updateDownloaded() {
   document.getElementById("downloaded").textContent = mb;
 }
 
+function pageView(pageUrl) {
+  if (!pageUrl || typeof Image === "undefined") return;
+  const img = new Image();
+  const cacheBuster =
+    Date.now().toString(36) + Math.random().toString(36).slice(2);
+  img.src = "/hawk.png?u=" + encodeURIComponent(pageUrl) + "&_=" + cacheBuster;
+}
+
 // Handle logo click to show about page
 const logoEl = document.getElementById("logo");
 logoEl.addEventListener("click", () => {
@@ -283,6 +291,7 @@ logoEl.addEventListener("click", () => {
   downloadedBytes = 0;
   document.getElementById("file-size").textContent = "-";
   updateDownloaded();
+  pageView("/");
 });
 
 const listEl = document.getElementById("image-list");
@@ -292,6 +301,7 @@ listEl.addEventListener("click", (e) => {
     document.getElementById("about").classList.add("hidden");
     document.getElementById("map").classList.remove("hidden");
     loadImage(clickedElement.dataset.id);
+    pageView(`/map/${clickedElement.dataset.id}`);
   }
 });
 
